@@ -1,14 +1,15 @@
 from RacketAndBall import Shape
 import random
 
+
 class Board:
-    def __init__(self, size):
+    def __init__(self, size, mode):
         self.size = size
         self.racket = Shape(20, 100, [40, self.size.height() // 2 + 50])
-        self.ball = Shape(20, 20, [self.size.width() // 2 - 10, self.size.height() // 2 + 10], speed=6,
-                          angle=random.randint(20, 60),
+        self.ball = Shape(20, 20, [self.size.width() // 2 - 10, self.size.height() // 2 + 10], speed=7,
+                          angle=random.randint(0, 360),
                           active=True)
-        self.racketEnemy = Shape(20, 100, [self.size.width() - 60, self.size.height() // 2 + 50])
+        self.racketEnemy = Shape(20, 100, [self.size.width() - 60, self.size.height() // 2 + 50], speed=4, bot=mode)
         self.rackets = [self.racket, self.racketEnemy]
         self.fail = False
 
@@ -20,13 +21,21 @@ class Board:
         self.rackets[id].passive()
 
     def moveRacket(self, id):
-        if self.rackets[id].active:
+        if self.rackets[id].active or self.rackets[id].bot:
+            if self.rackets[id].bot:
+                self.analysis(self.rackets[id])
             collisionWall, __angle = self.__collisionWall(self.rackets[id])
             collisionShape, __angleR = self.__collisionShape(self.rackets[id], [self.ball])
             if collisionShape:
                 self.ball.push([self.rackets[id].getSpeedX() * 0.4, self.rackets[id].getSpeedY() * 0.4])
             elif not collisionWall:
                 self.rackets[id].move()
+
+    def analysis(self, racket):
+        if (self.ball.Y() - self.ball.H() // 2) > (racket.Y() - racket.H() // 2) and racket.getSpeedY() < 0:
+            racket.forcedMove([0, -racket.getSpeedY()])
+        elif (self.ball.Y() - self.ball.H() // 2) < (racket.Y() - racket.H() // 2) and racket.getSpeedY() > 0:
+            racket.forcedMove([0, -racket.getSpeedY()])
 
     def moveBall(self):
         collisionWall, __angle = self.__collisionWall(self.ball)
@@ -67,7 +76,7 @@ class Board:
                 '''
                 x1, y1 = move.getNode(i)[0] + move.getSpeedX(), move.getNode(i)[
                     1] + move.getSpeedY()
-                x2, y2 = move.getNode(i+1)[0] + move.getSpeedX(), move.getNode(i+1)[
+                x2, y2 = move.getNode(i + 1)[0] + move.getSpeedX(), move.getNode(i + 1)[
                     1] + move.getSpeedY()
                 ptMove = [[x1, y1], [x2, y2]]
                 for j in range(st.getNumberNode()):

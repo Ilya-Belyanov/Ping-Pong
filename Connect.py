@@ -13,11 +13,13 @@ class Connector(QtWidgets.QMainWindow):
 
         self.timerMove = QtCore.QBasicTimer()
         self.show()
+        self.modeBot = True
         self.createBoard()
 
     def createBoard(self):
-        self.board = Board(self.ui.frame.size())
+        self.board = Board(self.ui.frame.size(), self.modeBot)
         self.ui.frame.setBoard(self.board)
+        self.ui.statusbar.showMessage("Bot:( "+str(self.modeBot)+" )change - 'B', special button 'N'")
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -27,10 +29,10 @@ class Connector(QtWidgets.QMainWindow):
         if key == QtCore.Qt.Key_S:
             self.board.pushRacket((0, -6), 0)
 
-        if key == QtCore.Qt.Key_Up:
+        if key == QtCore.Qt.Key_Up and not self.board.rackets[1].bot:
             self.board.pushRacket((0, 6), 1)
 
-        if key == QtCore.Qt.Key_Down:
+        if key == QtCore.Qt.Key_Down and not self.board.rackets[1].bot:
             self.board.pushRacket((0, -6), 1)
 
         if key == QtCore.Qt.Key_Space:
@@ -38,6 +40,18 @@ class Connector(QtWidgets.QMainWindow):
                 self.createBoard()
             self.timerMove.start(15, self)
             self.ui.frame.firstPress = False
+
+        if key == QtCore.Qt.Key_N:
+            self.createBoard()
+            self.timerMove.start(15, self)
+
+        if key == QtCore.Qt.Key_B:
+            self.board.rackets[1].setBot()
+            self.modeBot = self.board.rackets[1].bot
+            self.ui.statusbar.showMessage("Bot:( " + str(self.modeBot) + " )change - 'B', special button 'N'")
+
+        if key == QtCore.Qt.Key_Escape:
+            self.close()
 
     def keyReleaseEvent(self, event):
         key = event.key()
@@ -47,10 +61,10 @@ class Connector(QtWidgets.QMainWindow):
         if key == QtCore.Qt.Key_S:
             self.board.stopRacket(0)
 
-        if key == QtCore.Qt.Key_Up:
+        if key == QtCore.Qt.Key_Up and not self.board.rackets[1].bot:
             self.board.stopRacket(1)
 
-        if key == QtCore.Qt.Key_Down:
+        if key == QtCore.Qt.Key_Down and not self.board.rackets[1].bot:
             self.board.stopRacket(1)
 
     def timerEvent(self, event):

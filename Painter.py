@@ -3,6 +3,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Paint(QtWidgets.QFrame):
     """Central frame"""
+
     def __init__(self, parent):
         super().__init__(parent)
         self.firstPress = True
@@ -27,7 +28,6 @@ class Paint(QtWidgets.QFrame):
 
     def drawImage(self, qp):
         qp.drawPixmap(100, 0, QtGui.QPixmap("static/DeathMagnetic.jpg"))
-
 
     def drawRacket(self, qp):
         for racket in self.board.rackets:

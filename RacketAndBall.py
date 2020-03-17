@@ -54,22 +54,23 @@ class Vector:
 
 
 class Shape:
-    def __init__(self, w, h, coords, speed=0, angle=90, active=False):
+    def __init__(self, w, h, coords, speed=0, angle=90, active=False, bot=False):
         self.width = w
         self.height = h
         self.coords = coords
         self.color = (0, 0, 0, 255)
         self.speed = speed
         self.vector = Vector(self.speed, angle)
-        self.node = [[self.X(), self.Y()],\
+        self.node = [[self.X(), self.Y()], \
                      [self.X() + self.W(), self.Y()], \
                      [self.X() + self.W(), self.Y() - self.H()], \
                      [self.X(), self.Y() - self.H()]]
 
         self.active = active
+        self.bot = bot
 
     def move(self):
-        if self.active:
+        if self.active or self.bot:
             self.coords[0] += self.vector.getSpeedX()
             self.coords[1] += self.vector.getSpeedY()
 
@@ -93,6 +94,9 @@ class Shape:
         while id >= self.getNumberNode():
             id -= 4
         return self.node[id]
+
+    def setBot(self):
+        self.bot = not self.bot
 
     def action(self):
         self.active = True
